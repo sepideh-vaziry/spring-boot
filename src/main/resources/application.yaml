@@ -1,0 +1,64 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: demo-server
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/demo?useUnicode=yes&characterEncoding=UTF-8&characterSetResults=UTF-8&createDatabaseIfNotExist=true
+    username: root
+    password: root
+  jpa:
+    hibernate:
+      ddl-auto: none
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: UTC
+        connection:
+          characterEncoding: utf-8
+          CharSet: utf-8
+          useUnicode: true
+
+  liquibase:
+    change-log: classpath:db/changelog/db.changelog-master.xml
+
+jwt:
+  secret: dvd25vQuuiPZvi46advjewu
+  token_validity_in_hours: 4
+  refresh_token_validity_in_hours: 20
+
+cors:
+  enabled: false
+
+springdoc:
+  api-docs:
+    enabled: true
+
+google:
+  recaptcha:
+      secrets:
+        web: web_secret
+        android: android_secret
+        ios: ios_secret
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: prometheus,info,health
+
+  endpoint:
+    prometheus:
+      enabled: true
+
+logging:
+  level:
+    org:
+      springframework:
+        web: DEBUG
+  config: classpath:log4j2.xml
+
+site:
+  default_locale: en

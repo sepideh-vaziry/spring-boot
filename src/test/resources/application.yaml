@@ -1,0 +1,30 @@
+spring:
+  application:
+    name: demo-server
+
+  datasource:
+    url: jdbc:h2:mem:jib;DB_CLOSE_DELAY=-1;mode=mysql
+    username: sa
+    password:
+
+  sql:
+   init:
+     platform: h2
+     continue-on-error: true
+
+  liquibase:
+    enabled: false
+
+server:
+  port: 8080
+
+jwt:
+  secret: dvd25vQuuiPZvi46advjewu
+  token_validity_in_hours: 4
+  refresh_token_validity_in_hours: 20
+
+cors:
+  enabled: false
+
+site:
+  default_locale: en

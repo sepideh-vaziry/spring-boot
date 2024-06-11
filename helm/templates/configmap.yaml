@@ -1,0 +1,73 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "demo-server.configMapName" . }}
+  labels:
+    {{- include "demo-server.labels" . | nindent 4 }}
+
+data:
+  config: |
+    server:
+      port: 8080
+    
+    spring:
+      application:
+        name: {{ .Values.application.name }}
+    
+      datasource:
+        url: {{ .Values.application.datasource.url }}
+        username: {{ .Values.application.datasource.username }}
+        password: {{ .Values.application.datasource.password }}
+      jpa:
+        hibernate:
+          ddl-auto: none
+        properties:
+          hibernate:
+            jdbc:
+              time_zone: UTC
+            connection:
+              characterEncoding: utf-8
+              CharSet: utf-8
+              useUnicode: true
+    
+      liquibase:
+        change-log: classpath:db/changelog/db.changelog-master.xml
+  
+    jwt:
+      secret: {{ .Values.application.jwt.secret }}
+      token_validity_in_hours: {{ .Values.application.jwt.token_validity_in_hours }}
+      refresh_token_validity_in_hours: {{ .Values.application.jwt.refresh_token_validity_in_hours }}
+
+    cors:
+      enabled: {{ .Values.application.cors_enabled }}
+    
+    springdoc:
+      api-docs:
+        enabled: {{ .Values.application.swagger_enabled }}
+
+    google:
+      recaptcha:
+        secrets:
+          web: {{ .Values.application.google_recaptcha.web_secret }}
+          android: {{ .Values.application.google_recaptcha.android_secret }}
+          ios: {{ .Values.application.google_recaptcha.ios_secret }}
+    
+    management:
+      endpoints:
+        web:
+          exposure:
+            include: prometheus,info,health
+
+      endpoint:
+        prometheus:
+          enabled: true
+
+    logging:
+      level:
+        org:
+          springframework:
+            web: DEBUG
+      config: classpath:log4j2-k8s.xml
+    
+    site:
+      default_locale: {{ .Values.application.default_locale }}

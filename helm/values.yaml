@@ -1,0 +1,151 @@
+replicaCount: 1
+maxSurge: 25%
+maxUnavailable: 25%
+
+image:
+  repository: gitlab.com:5050/demo/demo-server
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: ""
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 1
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 60
+
+imagePullSecrets:
+  - name: "registry.gitlab.com-demo-docker-registry"
+
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  create: false
+  annotations: {}
+  name: ""
+
+podAnnotations: {}
+
+podSecurityContext: {}
+# fsGroup: 2000
+
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+# readOnlyRootFilesystem: true
+# runAsNonRoot: true
+# runAsUser: 1000
+
+service:
+  type: ClusterIP
+  port: 80
+
+ingress:
+  annotations:
+    cert-manager.io/cluster-issuer: lets-encrypt
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/limit-rps: "20"
+    nginx.ingress.kubernetes.io/limit-rpm: "120"
+    nginx.ingress.kubernetes.io/from-to-www-redirect: "true"
+    nginx.ingress.kubernetes.io/proxy-body-size: 10m
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      more_set_headers "X-Frame-Options: SAMEORIGIN";
+      more_set_headers "X-XSS-Protection: 1; mode=block";
+      proxy_set_header X-Forwarded-For $http_x_real_ip;
+      proxy_set_header X-Forwarded-For $http_ar_real_ip;
+      proxy_set_header X-Real-IP $http_ar_real_ip;
+      proxy_set_header User-Real-IP $http_ar_real_ip;
+
+  className: ""
+  enabled: true
+  hosts:
+    - host: demo.com
+      paths:
+        - path: /api
+          pathType: Prefix
+        - path: /swagger-ui.html
+          pathType: Prefix
+        - path: /swagger-ui/index.html
+          pathType: Prefix
+        - path: /swagger-ui/
+          pathType: Prefix
+        - path: /swagger-resources
+          pathType: Prefix
+        - path: /v3/api-docs
+          pathType: Prefix
+        - path: /webjars
+          pathType: Prefix
+        - path: /v2/api-docs
+          pathType: Prefix
+
+  tls:
+    - hosts:
+        - demo.com
+      secretName: demo.com
+    - hosts:
+        - www.demo.com
+      secretName: www.demo.com
+
+metrics:
+  enabled: false
+  prometheusRule:
+    enabled: false
+    rules:
+      - alert: JvmMemoryFillingUp
+        expr: (sum by (instance)(jvm_memory_used_bytes{area="heap"}) / sum by (instance)(jvm_memory_max_bytes{area="heap"})) * 100 > 80
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: JVM memory filling up (instance {{ $labels.instance }})
+          description: "JVM memory is filling up (> 80%)\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
+
+resources:
+  limits:
+    cpu: 4000m
+    memory: 5G
+  requests:
+    cpu: 1000m
+    memory: 1G
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+extraEnv: |
+  - name: JAVA_OPTS
+    value: >-
+      -XX:+UseContainerSupport
+      -XX:MaxRAMPercentage=80.0
+      -Djava.net.preferIPv4Stack=true
+
+application:
+  name: demo-server
+  cors_enabled: false
+  swagger_enabled: true
+  default_locale: fa
+
+  datasource:
+    url: jdbc:mysql://192.168.41.71:3306/demo_app?useUnicode=yes&characterEncoding=UTF-8&characterSetResults=UTF-8&createDatabaseIfNotExist=true
+    username: demo_user
+    password: password
+
+  jwt:
+    secret: dvP3@gZm09vdU86cLvslaQ234
+    token_validity_in_hours: 8
+    refresh_token_validity_in_hours: 24
+
+  google_recaptcha:
+    web_secret: web_secret
+    android_secret: android_secret
+    ios_secret: ios_secret

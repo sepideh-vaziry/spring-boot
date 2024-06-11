@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+  xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.4.xsd">
+
+  <changeSet id="CreateUser" author="Sepideh Vaziry">
+    <createTable tableName="user_role">
+      <column name="id" type="int" autoIncrement="true">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+
+      <column name="name" type="varchar(20)" defaultValue="null"/>
+    </createTable>
+
+    <createTable tableName="user">
+      <column name="id" type="bigint" autoIncrement="true">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+
+      <column name="role_id" type="int">
+        <constraints nullable="false" foreignKeyName="fk_user_role" references="user_role(id)"/>
+      </column>
+      <column name="exchange_user_id" type="bigint" defaultValue="null"/>
+      <column name="first_name" type="varchar(255)" defaultValue="null"/>
+      <column name="last_name" type="varchar(255)" defaultValue="null"/>
+      <column name="mobile" type="varchar(20)">
+        <constraints unique="true" nullable="false" />
+      </column>
+      <column name="national_code" type="varchar(20)" defaultValue="null"/>
+      <column name="password" type="varchar(255)" defaultValue="null"/>
+      <column name="fingerprint" type="varchar(30)" defaultValue="null"/>
+      <column name="created_at" type="datetime(3)" defaultValue="null"/>
+      <column name="updated_at" type="datetime(3)" defaultValue="null"/>
+    </createTable>
+  </changeSet>
+
+  <changeSet id="AddUserRole" author="Sepideh Vaziry">
+    <insert tableName="user_role">
+      <column name="name" value="USER" />
+    </insert>
+    <insert tableName="user_role">
+      <column name="name" value="SYSADMIN"/>
+    </insert>
+  </changeSet>
+
+  <changeSet id="UserLock" author="Sepideh Vaziry">
+    <createTable tableName="user_lock">
+      <column name="id" type="bigint" autoIncrement="true">
+        <constraints primaryKey="true" nullable="false" />
+      </column>
+
+      <column name="reason" type="varchar(30)" defaultValue="null" />
+      <column name="user_column" type="varchar(255)" defaultValue="null" />
+      <column name="count" type="int" defaultValue="0"/>
+      <column name="first_wrong_at" type="datetime(3)" defaultValue="null" />
+      <column name="lock_until" type="datetime(3)" defaultValue="null" />
+    </createTable>
+
+    <addUniqueConstraint
+            tableName="user_lock"
+            constraintName="uc_user_column_reason"
+            columnNames="reason, user_column" />
+  </changeSet>
+
+  <changeSet id="Organization" author="Sepideh Vaziry">
+    <createTable tableName="organization">
+      <column name="id" type="bigint" autoIncrement="true">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+
+      <column name="owner_id" type="bigint" >
+        <constraints nullable="false" />
+      </column>
+      <column name="name" type="varchar(100)" >
+        <constraints nullable="false" unique="true" />
+      </column>
+      <column name="description" type="varchar(255)" defaultValue="null" />
+    </createTable>
+  </changeSet>
+
+</databaseChangeLog>
