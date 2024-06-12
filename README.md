@@ -8,13 +8,13 @@ Table of contents
 =================
 <!--ts-->
 * [Overview](#Overview)
-* [Clean Architecture](#Clean Architecture)
-* [Project Structure](#Project Structure)
-* [Getting Started](#Getting Started)
-* [Building the Project](#Building the Project)
+* [Clean Architecture](#Clean-Architecture)
+* [Project Structure](#Project-Structure)
+* [Getting Started](#Getting-Started)
+* [Building the Project](#Building-the-Project)
 * [Dockerization](#Dockerization)
-* [Kubernetes Deployment](#Kubernetes Deployment)
-* [Helm Charts](#Helm Charts)
+* [Kubernetes Deployment](#Kubernetes-Deployment)
+* [Helm Charts](#Helm-Charts)
 <!--te-->
 
 Overview
